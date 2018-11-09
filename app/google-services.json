@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "146939033986",
+    "firebase_url": "https://parsistdesignapp.firebaseio.com",
+    "project_id": "parsistdesignapp",
+    "storage_bucket": "parsistdesignapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:146939033986:android:0aefa96cda09403c",
+        "android_client_info": {
+          "package_name": "com.example.erdo.parsistapps"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "146939033986-r5jqoj76caen8ftec5c7o00p9c0cdc24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYCMeicuvK2A8xgksHD6-2r0SunFE_0Cg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
