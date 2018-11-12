@@ -3,6 +3,7 @@ package com.example.erdo.parsistapps
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -73,6 +74,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
     var floatingActionMenu:FloatingActionMenu?=null
     var aboutUs:FloatingActionButton?=null
     var carList:FloatingActionButton?=null
+    var myDialog: Dialog?=null
     //var name=""
     //var nameInfoArray=HashSet<String>()
 
@@ -138,10 +140,29 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         //floatingActionMenu= findViewById(R.id.menu) as FloatingActionMenu
         aboutUs= findViewById(R.id.menu_item1) as FloatingActionButton?
         carList= findViewById(R.id.menu_item) as FloatingActionButton?
+        myDialog= Dialog(this)
 
         aboutUs?.setOnClickListener(object : View.OnClickListener{
             override fun onClick(v: View?) {
-                Toast.makeText(applicationContext,"Uygulamayı yapan: Erdoğan Abacı'dır",Toast.LENGTH_SHORT).show()
+                myDialog!!.setContentView(R.layout.custompopup)
+               var textClose = myDialog!!.findViewById(R.id.txtclose) as TextView
+               var webButton=myDialog!!.findViewById(R.id.btnweb) as Button
+             textClose.setOnClickListener( object : View.OnClickListener{
+                 override fun onClick(v: View?) {
+                     myDialog!!.dismiss()
+                 }
+
+
+             })
+                    myDialog!!.show()
+                webButton.setOnClickListener(object : View.OnClickListener{
+                    override fun onClick(v: View?) {
+                        val intent =Intent(Intent.ACTION_VIEW, Uri.parse("https://erdoganabaci.github.io/ParsistWebsite/"))
+                        startActivity(intent)
+                    }
+
+
+                })
             }
 
 
