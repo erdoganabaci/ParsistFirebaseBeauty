@@ -1,7 +1,6 @@
 package com.example.erdo.parsistapps
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.ProgressDialog
@@ -11,9 +10,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Typeface
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -21,13 +18,10 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.preference.Preference
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
-import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -46,24 +40,23 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
-import com.parse.Parse.getApplicationContext
 import com.parse.ParseException
 import com.parse.ParseFile
 import com.parse.ParseObject
 import com.parse.ParseQuery
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.lang.Exception
-import java.text.DecimalFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.HashMap
-import kotlin.concurrent.thread
+
 var latituteDouble :Double?=0.0
 var longituteDouble :Double?=0.0
 var userLocation=LatLng(latituteDouble!!,longituteDouble!!)
+var googleMap: GoogleMap? = null
+
 class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
+    internal lateinit var switch: Switch
     var firebaseDatabase:FirebaseDatabase? = null
     var myRef:DatabaseReference?=null
     var mStorageRef:StorageReference?=null
@@ -74,6 +67,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
     var floatingActionMenu:FloatingActionMenu?=null
     var aboutUs:FloatingActionButton?=null
     var carList:FloatingActionButton?=null
+    var changeMap:FloatingActionButton?=null
     var myDialog: Dialog?=null
     //var name=""
     //var nameInfoArray=HashSet<String>()
@@ -140,6 +134,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         //floatingActionMenu= findViewById(R.id.menu) as FloatingActionMenu
         aboutUs= findViewById(R.id.menu_item1) as FloatingActionButton?
         carList= findViewById(R.id.menu_item) as FloatingActionButton?
+        changeMap= findViewById(R.id.menu_item2) as FloatingActionButton?
         myDialog= Dialog(this)
 
         aboutUs?.setOnClickListener(object : View.OnClickListener{
@@ -176,6 +171,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
 
         })
+
 
 
 
@@ -228,6 +224,66 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         //upload()
         getFireLocation()
         mMap = googleMap
+        try{
+            val succes =googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.darkmap))
+            if (!succes){
+                Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+            }
+
+        }catch (e : Exception){
+            Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+
+        }
+
+
+        changeMap?.setOnClickListener(object : View.OnClickListener{
+            override fun onClick(v: View?) {
+                try{
+                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity,R.raw.standartmap))
+                    if (!succes)
+                    {
+                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                    }
+                }catch (e : Exception){
+                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+
+                }
+            }
+        })
+
+        switch= findViewById(R.id.switch1) as Switch
+        switch.setOnClickListener{
+            if (switch.isChecked==true){
+                switch.setTextColor(Color.BLACK)
+                try{
+                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity,R.raw.standartmap))
+                    if (!succes)
+                    {
+                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                    }
+                }catch (e : Exception){
+                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+
+                }
+            }
+            else{
+                switch.setTextColor(Color.WHITE)
+                try{
+                    val succes =googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.darkmap))
+                    if (!succes){
+                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                    }
+
+                }catch (e : Exception){
+                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+
+                }
+            }
+
+
+        }
+
+
         var  pd=ProgressDialog(this)
         //saveToParse() //bu kayıt etmek için
         locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -266,7 +322,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
             override fun onProviderDisabled(p0: String?) {
 
                val i =  Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
+                startActivity(i)
             }
         }
 

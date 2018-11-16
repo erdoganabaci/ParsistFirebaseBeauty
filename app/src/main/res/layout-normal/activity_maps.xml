@@ -16,6 +16,15 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity"
         />
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switch1"
+        android:text="Harita Renk"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginTop="480dp"
+        />
 
     <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/menu"
@@ -65,6 +74,14 @@
         fab:menu_fab_show_animation="@anim/my_show_animation"
         fab:menu_fab_hide_animation="@anim/my_hide_animation">
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/menu_item2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/about_us"
+            app:fab_colorNormal="@color/colorParsist"
+            app:fab_size="mini"
+            app:fab_label="Change Map Color" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/menu_item"
             android:layout_width="wrap_content"
