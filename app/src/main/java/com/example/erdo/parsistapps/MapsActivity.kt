@@ -40,6 +40,7 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.onesignal.OneSignal
 import com.parse.ParseException
 import com.parse.ParseFile
 import com.parse.ParseObject
@@ -174,6 +175,10 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
 
 
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init()
 
 
     }
