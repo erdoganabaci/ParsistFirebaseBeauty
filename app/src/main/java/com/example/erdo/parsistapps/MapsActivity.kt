@@ -50,26 +50,26 @@ import java.lang.Exception
 import java.util.*
 import kotlin.collections.HashMap
 
-var latituteDouble :Double?=0.0
-var longituteDouble :Double?=0.0
-var userLocation=LatLng(latituteDouble!!,longituteDouble!!)
+var latituteDouble: Double? = 0.0
+var longituteDouble: Double? = 0.0
+var userLocation = LatLng(latituteDouble!!, longituteDouble!!)
 var googleMap: GoogleMap? = null
 
-class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     internal lateinit var switch: Switch
-    var firebaseDatabase:FirebaseDatabase? = null
-    var myRef:DatabaseReference?=null
-    var mStorageRef:StorageReference?=null
+    var firebaseDatabase: FirebaseDatabase? = null
+    var myRef: DatabaseReference? = null
+    var mStorageRef: StorageReference? = null
     //val progressDialog = ProgressDialog(this@MapsActivity)
     //firebase
-    var locationManager:LocationManager?=null
-    var locationListener:LocationListener?=null
-    var floatingActionMenu:FloatingActionMenu?=null
-    var aboutUs:FloatingActionButton?=null
-    var carList:FloatingActionButton?=null
-    var changeMap:FloatingActionButton?=null
-    var myDialog: Dialog?=null
+    var locationManager: LocationManager? = null
+    var locationListener: LocationListener? = null
+    var floatingActionMenu: FloatingActionMenu? = null
+    var aboutUs: FloatingActionButton? = null
+    var carList: FloatingActionButton? = null
+    var changeMap: FloatingActionButton? = null
+    var myDialog: Dialog? = null
     //var name=""
     //var nameInfoArray=HashSet<String>()
 
@@ -79,31 +79,31 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
     //private var locationUpdatedAt = java.lang.Long.MIN_VALUE
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val menuInflater=menuInflater
-        menuInflater.inflate(R.menu.show_maplist,menu)
+        val menuInflater = menuInflater
+        menuInflater.inflate(R.menu.show_maplist, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId==R.id.show_maplist){
-            val intent=Intent(applicationContext,MainActivity::class.java)
+        if (item?.itemId == R.id.show_maplist) {
+            val intent = Intent(applicationContext, MainActivity::class.java)
             startActivity(intent)
 
         }
         return super.onOptionsItemSelected(item)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.supportActionBar?.hide()
-        val thread =Thread(object : Runnable{
+        val thread = Thread(object : Runnable {
             override fun run() {
-                val getPrefs= PreferenceManager.getDefaultSharedPreferences(baseContext)
-                val isFirstStart:Boolean=getPrefs.getBoolean("firstStart",true)
-                if (isFirstStart)
-                {
-                    startActivity(Intent(applicationContext,IntroSlider::class.java))
-                    val e: SharedPreferences.Editor=getPrefs.edit()
-                    e.putBoolean("firstStart",false)
+                val getPrefs = PreferenceManager.getDefaultSharedPreferences(baseContext)
+                val isFirstStart: Boolean = getPrefs.getBoolean("firstStart", true)
+                if (isFirstStart) {
+                    startActivity(Intent(applicationContext, IntroSlider::class.java))
+                    val e: SharedPreferences.Editor = getPrefs.edit()
+                    e.putBoolean("firstStart", false)
                     e.apply()
                 }
 
@@ -117,13 +117,13 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
 
 
-        firebaseDatabase= FirebaseDatabase.getInstance()
-        myRef= firebaseDatabase!!.getReference()
-        mStorageRef=FirebaseStorage.getInstance().getReference()
+        firebaseDatabase = FirebaseDatabase.getInstance()
+        myRef = firebaseDatabase!!.getReference()
+        mStorageRef = FirebaseStorage.getInstance().getReference()
 
-        if (isConnected(this)==false){
+        if (isConnected(this) == false) {
             buildDialog(this).show()
-        }else{
+        } else {
             setContentView(R.layout.activity_maps)
             // Obtain the SupportMapFragment and get notified when the map is ready to be used.
             val mapFragment = supportFragmentManager
@@ -133,27 +133,27 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         }
 
         //floatingActionMenu= findViewById(R.id.menu) as FloatingActionMenu
-        aboutUs= findViewById(R.id.menu_item1) as FloatingActionButton?
-        carList= findViewById(R.id.menu_item) as FloatingActionButton?
-        changeMap= findViewById(R.id.menu_item2) as FloatingActionButton?
-        myDialog= Dialog(this)
+        aboutUs = findViewById(R.id.menu_item1) as FloatingActionButton?
+        carList = findViewById(R.id.menu_item) as FloatingActionButton?
+        changeMap = findViewById(R.id.menu_item2) as FloatingActionButton?
+        myDialog = Dialog(this)
 
-        aboutUs?.setOnClickListener(object : View.OnClickListener{
+        aboutUs?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 myDialog!!.setContentView(R.layout.custompopup)
-               var textClose = myDialog!!.findViewById(R.id.txtclose) as TextView
-               var webButton=myDialog!!.findViewById(R.id.btnweb) as Button
-             textClose.setOnClickListener( object : View.OnClickListener{
-                 override fun onClick(v: View?) {
-                     myDialog!!.dismiss()
-                 }
-
-
-             })
-                    myDialog!!.show()
-                webButton.setOnClickListener(object : View.OnClickListener{
+                var textClose = myDialog!!.findViewById(R.id.txtclose) as TextView
+                var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                textClose.setOnClickListener(object : View.OnClickListener {
                     override fun onClick(v: View?) {
-                        val intent =Intent(Intent.ACTION_VIEW, Uri.parse("https://erdoganabaci.github.io/ParsistWebsite/"))
+                        myDialog!!.dismiss()
+                    }
+
+
+                })
+                myDialog!!.show()
+                webButton.setOnClickListener(object : View.OnClickListener {
+                    override fun onClick(v: View?) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://erdoganabaci.github.io/ParsistWebsite/"))
                         startActivity(intent)
                     }
 
@@ -164,9 +164,9 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
         })
 
-        carList?.setOnClickListener(object : View.OnClickListener{
+        carList?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                val intent=Intent(applicationContext,MainActivity::class.java)
+                val intent = Intent(applicationContext, MainActivity::class.java)
                 startActivity(intent)
             }
 
@@ -182,31 +182,33 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
 
     }
-    fun isConnected(context:Context):Boolean {
+
+    fun isConnected(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val netinfo = cm.getActiveNetworkInfo()
 
-        if (netinfo!=null && netinfo.isConnectedOrConnecting){
+        if (netinfo != null && netinfo.isConnectedOrConnecting) {
             val wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
             val mobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
-            if (mobile!=null && mobile.isConnectedOrConnecting || wifi!=null && wifi.isConnectedOrConnecting){
+            if (mobile != null && mobile.isConnectedOrConnecting || wifi != null && wifi.isConnectedOrConnecting) {
                 return true
-            }else{
+            } else {
                 return false
             }
-        }else{
+        } else {
             return false
         }
 //You need to have Mobile Data or wifi to access this
 
     }
-    fun buildDialog(c:Context): AlertDialog.Builder {
+
+    fun buildDialog(c: Context): AlertDialog.Builder {
         val builder = AlertDialog.Builder(c)
         builder.setTitle("No Internet Connection")
         builder.setMessage("Lütfen Internet Bağlantınızı Kontrol Ediniz.Devam etmek için Ok basınız.")
         builder.setCancelable(false)
-        builder.setPositiveButton("Ok", object: DialogInterface.OnClickListener {
-            override fun onClick(dialog:DialogInterface, which:Int) {
+        builder.setPositiveButton("Ok", object : DialogInterface.OnClickListener {
+            override fun onClick(dialog: DialogInterface, which: Int) {
                 finish()
             }
         })
@@ -229,58 +231,55 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         //upload()
         getFireLocation()
         mMap = googleMap
-        try{
-            val succes =googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.darkmap))
-            if (!succes){
-                Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+        try {
+            val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap))
+            if (!succes) {
+                Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
             }
 
-        }catch (e : Exception){
-            Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
 
         }
 
 
-        changeMap?.setOnClickListener(object : View.OnClickListener{
+        changeMap?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                try{
-                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity,R.raw.standartmap))
-                    if (!succes)
-                    {
-                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                try {
+                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.standartmap))
+                    if (!succes) {
+                        Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
                     }
-                }catch (e : Exception){
-                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
 
                 }
             }
         })
 
-        switch= findViewById(R.id.switch1) as Switch
-        switch.setOnClickListener{
-            if (switch.isChecked==true){
+        switch = findViewById(R.id.switch1) as Switch
+        switch.setOnClickListener {
+            if (switch.isChecked == true) {
                 switch.setTextColor(Color.BLACK)
-                try{
-                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity,R.raw.standartmap))
-                    if (!succes)
-                    {
-                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                try {
+                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.standartmap))
+                    if (!succes) {
+                        Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
                     }
-                }catch (e : Exception){
-                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
 
                 }
-            }
-            else{
+            } else {
                 switch.setTextColor(Color.WHITE)
-                try{
-                    val succes =googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this,R.raw.darkmap))
-                    if (!succes){
-                        Toast.makeText(applicationContext,"Map Parsing Failed",Toast.LENGTH_SHORT).show()
+                try {
+                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap))
+                    if (!succes) {
+                        Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
                     }
 
-                }catch (e : Exception){
-                    Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
 
                 }
             }
@@ -289,31 +288,29 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         }
 
 
-        var  pd=ProgressDialog(this)
+        var pd = ProgressDialog(this)
         //saveToParse() //bu kayıt etmek için
-        locationManager=getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         // val lastLocation=locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
         // val lastUserLocation=LatLng(lastLocation.latitude,lastLocation.longitude)
         //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f))
-        locationListener =object : LocationListener{
+        locationListener = object : LocationListener {
             override fun onLocationChanged(p0: Location?) {
-                if (p0!=null){
+                if (p0 != null) {
                     //mMap.clear()
                     //locationManager?.removeUpdates(locationListener)
 
                     //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation,17f))
-                    userLocation=LatLng(p0?.latitude,p0?.longitude)
-                   // var deletedMarker =mMap.addMarker(MarkerOptions().position(userLocation).title("Benim Konumum").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
+                    userLocation = LatLng(p0?.latitude, p0?.longitude)
+                    // var deletedMarker =mMap.addMarker(MarkerOptions().position(userLocation).title("Benim Konumum").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
 
 
                 }
-                 //mMap.addMarker(MarkerOptions().position(userLocation).title("Benim Konumum").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
+                //mMap.addMarker(MarkerOptions().position(userLocation).title("Benim Konumum").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)))
                 pd.dismiss()
                 //getLocation()
 
             }
-
-
 
 
             override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
@@ -326,80 +323,70 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
             override fun onProviderDisabled(p0: String?) {
 
-               val i =  Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                val i = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 startActivity(i)
             }
         }
 
 
 
-        if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_DENIED  && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),1)
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
             //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),2)
-        }else{
+        } else {
             //getLocation()
-            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0f,locationListener)
+            locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
             //mMap.clear()
-            val lastLocation=locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val lastLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
 
-                if(lastLocation!=null){
-                    val lastUserLocation=LatLng(lastLocation.latitude,lastLocation.longitude)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,11.5f),3000,null)  //burası eskiye giriyor.verileri alıp yazdır.
+            if (lastLocation != null) {
+                val lastUserLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation, 11.5f), 3000, null)  //burası eskiye giriyor.verileri alıp yazdır.
 
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f),5000,null)
-                    //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f))
-                    pd.setMessage("Parklar Yükleniyor...")
-                    pd.show()
-                    pd.setCancelable(true)
-                    mMap.setMyLocationEnabled(true)
-                }
-              else {
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f),5000,null)
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f))
+                pd.setMessage("Parklar Yükleniyor...")
+                pd.show()
+                pd.setCancelable(true)
+                mMap.setMyLocationEnabled(true)
+            } else {
 
-                    mMap.setMyLocationEnabled(true)
-                    //Toast.makeText(this,"Lütfen Konumunuzu Açınız ve Uygulamayı Yeniden Başlatınız",Toast.LENGTH_LONG).show()
-                    //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),1)
-                }
-
-
-
-
-
-
+                mMap.setMyLocationEnabled(true)
+                //Toast.makeText(this,"Lütfen Konumunuzu Açınız ve Uygulamayı Yeniden Başlatınız",Toast.LENGTH_LONG).show()
+                //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),1)
+            }
 
 
         }
 
 
-
-
-
     }
 
-    fun upload(){
-        var uuid =UUID.randomUUID()
-        var imageName="images/"+uuid+".jpg"
-        var storageReference=mStorageRef!!.child(imageName)
-        val selectedImage=Uri.parse("android.resource://com.example.erdo.parsistapps/drawable/balmumuacik")
+    fun upload() {
+        var uuid = UUID.randomUUID()
+        var imageName = "images/" + uuid + ".jpg"
+        var storageReference = mStorageRef!!.child(imageName)
+        val selectedImage = Uri.parse("android.resource://com.example.erdo.parsistapps/drawable/balmumuacik")
         //var selectedImage:InputStream=getContentResolver().openInputStream(uri)
-        storageReference.putFile(selectedImage).addOnSuccessListener(this, object :OnSuccessListener<UploadTask.TaskSnapshot>{
-            override fun onSuccess(taskSnapshot:UploadTask.TaskSnapshot) {
-                val newReference=FirebaseStorage.getInstance().getReference(imageName)
-                newReference.downloadUrl.addOnSuccessListener(object :OnSuccessListener<Uri>{
+        storageReference.putFile(selectedImage).addOnSuccessListener(this, object : OnSuccessListener<UploadTask.TaskSnapshot> {
+            override fun onSuccess(taskSnapshot: UploadTask.TaskSnapshot) {
+                val newReference = FirebaseStorage.getInstance().getReference(imageName)
+                newReference.downloadUrl.addOnSuccessListener(object : OnSuccessListener<Uri> {
                     override fun onSuccess(uri: Uri) {
-                        val downloadUrl=uri.toString()
-                        val parkname="Ispark Balmumcu Acık"
-                        val parkDetail="----"
-                        val latitute="41.061968"
-                        val longitute="29.010787"
-                        val uuid1=UUID.randomUUID()
-                        val  uuidString=uuid1.toString()
+                        val downloadUrl = uri.toString()
+                        val parkname = "Ispark Balmumcu Acık"
+                        val parkDetail = "----"
+                        val latitute = "41.061968"
+                        val longitute = "29.010787"
+                        val uuid1 = UUID.randomUUID()
+                        val uuidString = uuid1.toString()
                         myRef?.child("Locations")?.child(uuidString)?.child("parkname")?.setValue(parkname)
                         myRef?.child("Locations")?.child(uuidString)?.child("parkdetail")?.setValue(parkDetail)
                         myRef?.child("Locations")?.child(uuidString)?.child("latitute")?.setValue(latitute)
                         myRef?.child("Locations")?.child(uuidString)?.child("longitute")?.setValue(longitute)
                         myRef?.child("Locations")?.child(uuidString)?.child("downloadurl")?.setValue(downloadUrl)
-                        Toast.makeText(applicationContext,"Firebase Kayıt Başarılı",Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, "Firebase Kayıt Başarılı", Toast.LENGTH_SHORT).show()
 
                     }
 
@@ -408,18 +395,19 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
             }
 
 
-        }).addOnFailureListener(this,object: OnFailureListener{
+        }).addOnFailureListener(this, object : OnFailureListener {
             override fun onFailure(p0: Exception) {
-                Toast.makeText(applicationContext,p0.localizedMessage,Toast.LENGTH_LONG).show()
-                println("Hata"+p0.toString())
+                Toast.makeText(applicationContext, p0.localizedMessage, Toast.LENGTH_LONG).show()
+                println("Hata" + p0.toString())
             }
 
         })
     }
-    fun getFireLocation(){
-        val forFireDetail=ArrayList<String>()
-        val newReference=firebaseDatabase?.getReference("Locations")
-        newReference?.addValueEventListener(object : ValueEventListener{
+
+    fun getFireLocation() {
+        val forFireDetail = ArrayList<String>()
+        val newReference = firebaseDatabase?.getReference("Locations")
+        newReference?.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
                 Toast.makeText(applicationContext, "Database Connection Failed ", Toast.LENGTH_SHORT).show()
             }
@@ -428,13 +416,13 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
                 for (ds in p0.children) {
                     //println("Ds "+ds.getValue())
                     val hashMap: (HashMap<String, String>) = ds.getValue() as HashMap<String, String>
-                    val parkname=hashMap.get("parkname") as String
-                    val parkdetail =hashMap.get("parkdetail") as String
-                    val latitute =hashMap.get("latitute") as String
-                    val longitute =hashMap.get("longitute") as String
-                    val latitudeDouble=latitute.toDouble()
-                    val longituteDouble=longitute.toDouble()
-                    val userLocation=LatLng(latitudeDouble,longituteDouble)
+                    val parkname = hashMap.get("parkname") as String
+                    val parkdetail = hashMap.get("parkdetail") as String
+                    val latitute = hashMap.get("latitute") as String
+                    val longitute = hashMap.get("longitute") as String
+                    val latitudeDouble = latitute.toDouble()
+                    val longituteDouble = longitute.toDouble()
+                    val userLocation = LatLng(latitudeDouble, longituteDouble)
                     val locationA = Location("point A")
                     locationA.setLatitude(com.example.erdo.parsistapps.userLocation.latitude)
                     locationA.setLongitude(com.example.erdo.parsistapps.userLocation.longitude)
@@ -445,19 +433,19 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
                     //Picasso.get().load(uriImage).into(imageView); resmi yüklüyor.
                     var distance = locationA.distanceTo(locationB)
 
-                    distance= (distance/1000.0).toFloat()
+                    distance = (distance / 1000.0).toFloat()
                     var s = String.format("%.2f", distance)
                     forFireDetail.add(parkname)
 
-                    mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:"+parkdetail+"\nKuşuçuşu Uzaklığım:"+s+" km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
+                    mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
                     mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(applicationContext))
-                    mMap.setOnInfoWindowClickListener(object  : GoogleMap.OnInfoWindowClickListener{
+                    mMap.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
                         override fun onInfoWindowClick(p0: Marker?) {
-                            val markerTitle =p0?.title
-                            for (placename in  forFireDetail){
-                                if (markerTitle.equals(placename)){
-                                    val intent =Intent(applicationContext,DetailActivity::class.java)
-                                    intent.putExtra("name",placename)
+                            val markerTitle = p0?.title
+                            for (placename in forFireDetail) {
+                                if (markerTitle.equals(placename)) {
+                                    val intent = Intent(applicationContext, DetailActivity::class.java)
+                                    intent.putExtra("name", placename)
 
                                     startActivity(intent)
                                 }
@@ -471,33 +459,30 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         })
 
 
-
-
     }
-    fun getLocation(){
 
-        val forDetail=ArrayList<String>()
+    fun getLocation() {
 
-        val query=ParseQuery<ParseObject>("Locations")
-        query.findInBackground{objects, e ->
-            if(e!=null)
-            {
-                Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_LONG).show()
-            }else{
-                if (objects.size>0)
-                {
-                    for (parseObject in objects){
+        val forDetail = ArrayList<String>()
 
-                        val name =parseObject.get("name") as String
-                        val detail=parseObject.get("detail") as String
+        val query = ParseQuery<ParseObject>("Locations")
+        query.findInBackground { objects, e ->
+            if (e != null) {
+                Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_LONG).show()
+            } else {
+                if (objects.size > 0) {
+                    for (parseObject in objects) {
 
-                        val latitude =parseObject.get("latitute") as String
-                        val longitute =parseObject.get("longitute") as String
-                        val latituteDouble=latitude.toDouble()
-                        val longituteDouble=longitute.toDouble()
-                        val userLocate=LatLng(latituteDouble!!,longituteDouble!!)
+                        val name = parseObject.get("name") as String
+                        val detail = parseObject.get("detail") as String
+
+                        val latitude = parseObject.get("latitute") as String
+                        val longitute = parseObject.get("longitute") as String
+                        val latituteDouble = latitude.toDouble()
+                        val longituteDouble = longitute.toDouble()
+                        val userLocate = LatLng(latituteDouble!!, longituteDouble!!)
                         forDetail.add(name)
-                       // println(forDetail)
+                        // println(forDetail)
                         val locationA = Location("point A")
                         locationA.setLatitude(userLocation.latitude)
                         locationA.setLongitude(userLocation.longitude)
@@ -506,7 +491,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
                         locationB.setLongitude(longituteDouble)
                         var distance = locationA.distanceTo(locationB)
 
-                        distance= (distance/1000.0).toFloat()
+                        distance = (distance / 1000.0).toFloat()
                         //var decimalFormat = DecimalFormat("#.##")
                         //var twoDigitsDistance = java.lang.Float.valueOf(decimalFormat.format(distance))
                         //var distanceString = java.lang.Float.toString(distance)
@@ -518,20 +503,18 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
 
                         //"Ortalama Uzaklık: "+distanceString+"\n"+detail
-                        mMap.addMarker(MarkerOptions().position(userLocate).title(name).snippet("Detaylar:"+detail+"\nKuşuçuşu Uzaklığım:"+s+" km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
+                        mMap.addMarker(MarkerOptions().position(userLocate).title(name).snippet("Detaylar:" + detail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
                         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocate,11.5f))
                         mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this))
 
-                        mMap.setOnInfoWindowClickListener(object: GoogleMap.OnInfoWindowClickListener {
-                            override fun onInfoWindowClick(marker:Marker) {
+                        mMap.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
+                            override fun onInfoWindowClick(marker: Marker) {
                                 val markerTitle = marker.title
                                 //Cycle through places array
-                                for (place in forDetail)
-                                {
-                                    if (markerTitle.equals(place))
-                                    {
-                                        val intent =Intent(applicationContext,DetailActivity::class.java)
-                                        intent.putExtra("name",place)
+                                for (place in forDetail) {
+                                    if (markerTitle.equals(place)) {
+                                        val intent = Intent(applicationContext, DetailActivity::class.java)
+                                        intent.putExtra("name", place)
                                         startActivity(intent)
                                     }
                                 }
@@ -540,7 +523,7 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
 
                     }
 
-                   // println(forDetail+"bu for döngüsünden cıktıktan sonradır")
+                    // println(forDetail+"bu for döngüsünden cıktıktan sonradır")
 
 
                 }
@@ -550,50 +533,46 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-
-
-
-    fun saveToParse(){
-        var choosenImage :Bitmap?=null
-        val byteArrayOutputStream=ByteArrayOutputStream()
-        val bytes=byteArrayOutputStream.toByteArray()
-        val parseFile=ParseFile("image.png",bytes)
-        val parseObject=ParseObject("Locations")
-        parseObject.put("name","deneme")
-        parseObject.put("latitute","38.405765")
-        parseObject.put("longitute","27.098422")
+    fun saveToParse() {
+        var choosenImage: Bitmap? = null
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val bytes = byteArrayOutputStream.toByteArray()
+        val parseFile = ParseFile("image.png", bytes)
+        val parseObject = ParseObject("Locations")
+        parseObject.put("name", "deneme")
+        parseObject.put("latitute", "38.405765")
+        parseObject.put("longitute", "27.098422")
         // parseObject.put("name","Erdo")
         //parseObject.put("latitute","38.376037")
         //parseObject.put("longitute","27.188325")
         //parseObject.put("image",parseFile)
-        parseObject.saveInBackground{e: ParseException? ->
-            if (e!=null){
-                Toast.makeText(applicationContext,e.localizedMessage,Toast.LENGTH_LONG).show()
-            }else
-            {
-                Toast.makeText(applicationContext,"Yer Kaydedildi",Toast.LENGTH_LONG).show()
+        parseObject.saveInBackground { e: ParseException? ->
+            if (e != null) {
+                Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(applicationContext, "Yer Kaydedildi", Toast.LENGTH_LONG).show()
             }
 
         }
     }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (grantResults.size>0 && requestCode==1){
-            if (ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)==PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED ){
-                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0f,locationListener)
+        if (grantResults.size > 0 && requestCode == 1) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener)
                 //mMap.clear()
-                val lastLocation=locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                if(lastLocation!=null){
-                    val lastUserLocation=LatLng(lastLocation.latitude,lastLocation.longitude)
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,11.5f),3000,null)  //burası eskiye giriyor.verileri alıp yazdır.
+                val lastLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (lastLocation != null) {
+                    val lastUserLocation = LatLng(lastLocation.latitude, lastLocation.longitude)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation, 11.5f), 3000, null)  //burası eskiye giriyor.verileri alıp yazdır.
 
                     //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f),5000,null)
                     //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(lastUserLocation,18f))
 
                     mMap.setMyLocationEnabled(true)
-                }
-                else {
+                } else {
                     mMap.setMyLocationEnabled(true)
-                   // Toast.makeText(this,"Lütfen Konumunuzu Açınız ve Uygulamayı Yeniden Başlatınız",Toast.LENGTH_LONG).show()
+                    // Toast.makeText(this,"Lütfen Konumunuzu Açınız ve Uygulamayı Yeniden Başlatınız",Toast.LENGTH_LONG).show()
                     //ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION),1)
                 }
                 //getLocation()
@@ -603,7 +582,6 @@ class MapsActivity :  AppCompatActivity(), OnMapReadyCallback {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
-
 
 
 /*

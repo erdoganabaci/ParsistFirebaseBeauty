@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView android:id="@+id/bottom_sheet1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="true"
+    android:background="@android:color/white"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".DetailActivity"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/tap_action_layout"
+            android:padding="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/nameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="id degiscekid degiscekid degiscekid degiscekid degiscekid degiscek"
+                android:textSize="14dp"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textColor="@color/dark"/>
+
+        </LinearLayout>
+
+        <android.support.v7.widget.CardView
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="4dp"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.github.ybq.android.spinkit.SpinKitView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/SpinKit"
+                style="@style/SpinKitView.Large.Circle"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                app:SpinKit_Color="@color/colorPrimary" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="130dp"
+                    android:id="@+id/detailImageView"/>
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+        <android.support.v7.widget.CardView
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="4dp"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+                <TextView
+                    android:id="@+id/detailTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="id degiscekid degiscekid degiscekid llfkaflkafldegiscekid degiscekid degiscek"
+                    android:textSize="14dp"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:gravity="center"
+                    android:textColor="@color/dark"/>
+
+
+            </LinearLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="4dp"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="vertical">
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:orientation="horizontal"
+                   android:padding="15dp">
+
+                   <LinearLayout
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:orientation="vertical"
+                       android:layout_weight="1">
+
+                       <RelativeLayout
+                           android:layout_margin="10dp"
+                           android:gravity="center"
+                           android:layout_gravity="center"
+                           android:padding="10dp"
+                           android:background="@drawable/circleshape"
+                           android:layout_width="60dp"
+                           android:layout_height="60dp">
+
+                           <ImageView
+                               android:layout_width="35dp"
+                               android:layout_height="35dp"
+                               android:src="@drawable/ic_directions_car_black_24dp" />
+
+                       </RelativeLayout>
+
+                       <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_gravity="center"
+                           android:gravity="center"
+                           android:text="Açık Otopark"
+                           android:textColor="@color/grey" />
+
+                   </LinearLayout>
+                   <LinearLayout
+                       android:layout_weight="1"
+                       android:orientation="vertical"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content">
+
+                       <RelativeLayout
+                           android:layout_margin="10dp"
+                           android:gravity="center"
+                           android:layout_gravity="center"
+                           android:padding="10dp"
+                           android:background="@drawable/circleshape"
+                           android:layout_width="60dp"
+                           android:layout_height="60dp">
+
+                           <ImageView
+                               android:src="@drawable/ic_place_white_24dp"
+                               android:layout_width="35dp"
+                               android:layout_height="35dp" />
+
+                       </RelativeLayout>
+
+                       <TextView
+                           android:layout_gravity="center"
+                           android:gravity="center"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:textColor="@color/grey"
+                           android:text="Kolay Ulaşım"/>
+
+                   </LinearLayout>
+                   <LinearLayout
+                       android:layout_weight="1"
+                       android:orientation="vertical"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content">
+
+                       <RelativeLayout
+                           android:layout_margin="10dp"
+                           android:gravity="center"
+                           android:layout_gravity="center"
+                           android:padding="10dp"
+                           android:background="@drawable/circleshape"
+                           android:layout_width="60dp"
+                           android:layout_height="60dp">
+
+                           <ImageView
+                               android:src="@drawable/ic_restaurant_white_24dp"
+                               android:layout_width="35dp"
+                               android:layout_height="35dp" />
+
+                       </RelativeLayout>
+
+                       <TextView
+                           android:layout_gravity="center"
+                           android:gravity="center"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:textColor="@color/grey"
+                           android:text="Restaurant"/>
+
+                   </LinearLayout>
+
+               </LinearLayout>
+
+
+
+           </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="4dp"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="15dp">
+
+                <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:map="http://schemas.android.com/apk/res-auto"
+                    xmlns:tools="http://schemas.android.com/tools"
+                    android:id="@+id/mapView"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginTop="300dp"
+                    tools:context=".DetailActivity" />
+
+            </android.support.constraint.ConstraintLayout>
+
+
+        </android.support.v7.widget.CardView>
+
+
+    </LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>
