@@ -17,10 +17,12 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
+
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
@@ -28,6 +30,7 @@ import android.view.View
 import android.widget.*
 import com.github.clans.fab.FloatingActionButton
 import com.github.clans.fab.FloatingActionMenu
+import com.github.ybq.android.spinkit.style.Wave
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -45,6 +48,11 @@ import com.parse.ParseException
 import com.parse.ParseFile
 import com.parse.ParseObject
 import com.parse.ParseQuery
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
+import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.customcardpopup.*
+import kotlinx.android.synthetic.main.mycard.*
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.util.*
@@ -70,6 +78,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var carList: FloatingActionButton? = null
     var changeMap: FloatingActionButton? = null
     var myDialog: Dialog? = null
+    var myDialogAbout: Dialog? = null
+    var progressBar: ProgressBar? = null
     //var name=""
     //var nameInfoArray=HashSet<String>()
 
@@ -92,6 +102,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         return super.onOptionsItemSelected(item)
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,39 +141,42 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     .findFragmentById(R.id.map) as SupportMapFragment
             mapFragment.getMapAsync(this)
 
+
         }
 
-        //floatingActionMenu= findViewById(R.id.menu) as FloatingActionMenu
+        //floatingActionMenu= findViewById(R.id.menu) as FloatingActionMenu  //çalıştırıca hata veriyor null pointer hatası
         aboutUs = findViewById(R.id.menu_item1) as FloatingActionButton?
         carList = findViewById(R.id.menu_item) as FloatingActionButton?
         changeMap = findViewById(R.id.menu_item2) as FloatingActionButton?
-        myDialog = Dialog(this)
 
-        aboutUs?.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                myDialog!!.setContentView(R.layout.custompopup)
-                var textClose = myDialog!!.findViewById(R.id.txtclose) as TextView
-                var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+         myDialogAbout = Dialog(this)
+
+         aboutUs?.setOnClickListener(object : View.OnClickListener {
+             override fun onClick(v: View?) {
+                 myDialogAbout!!.setContentView(R.layout.custompopup)
+                var textClose = myDialogAbout!!.findViewById(R.id.txtclose) as TextView
+                 var webButton = myDialogAbout!!.findViewById(R.id.btnweb) as Button
                 textClose.setOnClickListener(object : View.OnClickListener {
                     override fun onClick(v: View?) {
-                        myDialog!!.dismiss()
-                    }
+                         myDialogAbout!!.dismiss()
+                   }
+
+
+             })
+                 myDialogAbout!!.show()
+               webButton.setOnClickListener(object : View.OnClickListener {
+                     override fun onClick(v: View?) {
+                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://erdoganabaci.github.io/ParsistWebsite/"))
+                       startActivity(intent)
+                  }
 
 
                 })
-                myDialog!!.show()
-                webButton.setOnClickListener(object : View.OnClickListener {
-                    override fun onClick(v: View?) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://erdoganabaci.github.io/ParsistWebsite/"))
-                        startActivity(intent)
-                    }
+             }
 
 
-                })
-            }
+         })
 
-
-        })
 
         carList?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
@@ -227,10 +241,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
 
     override fun onMapReady(googleMap: GoogleMap) {
-
+        myDialog = Dialog(this)
         //upload()
         getFireLocation()
         mMap = googleMap
+
+        progressBar = findViewById(R.id.SpinKit)
+        val wave: Wave = Wave()
+        progressBar?.setIndeterminateDrawableTiled(wave)
         try {
             val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.darkmap))
             if (!succes) {
@@ -286,6 +304,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         }
+        /*
+        myDialog = Dialog(this)
+        aboutUs = findViewById(R.id.menu_item1) as FloatingActionButton?
+        aboutUs?.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                myDialog!!.setContentView(R.layout.customcardpopup)
+                var textCloseCard = myDialog!!.findViewById(R.id.txtclosecard) as TextView
+                //var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                textCloseCard.setOnClickListener(object : View.OnClickListener {
+                    override fun onClick(v: View?) {
+                        myDialog!!.dismiss()
+                    }
+
+
+                })
+                myDialog!!.show()
+            }
+
+
+        })*/
 
 
         var pd = ProgressDialog(this)
@@ -415,10 +453,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onDataChange(p0: DataSnapshot) {
                 for (ds in p0.children) {
                     //println("Ds "+ds.getValue())
+                    if (ds.exists()) {
                     val hashMap: (HashMap<String, String>) = ds.getValue() as HashMap<String, String>
                     val parkname = hashMap.get("parkname") as String
                     val parkdetail = hashMap.get("parkdetail") as String
                     val latitute = hashMap.get("latitute") as String
+                    val situation = hashMap.get("situation") as String
                     val longitute = hashMap.get("longitute") as String
                     val latitudeDouble = latitute.toDouble()
                     val longituteDouble = longitute.toDouble()
@@ -429,31 +469,209 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val locationB = Location("point B")
                     locationB.setLatitude(latitudeDouble)
                     locationB.setLongitude(longituteDouble)
-                    //val uriImage=hashMap.get("downloadurl") as String
+                    val uriImage = hashMap.get("downloadurl") as String
+                    //println("myuri" + uriImage)
                     //Picasso.get().load(uriImage).into(imageView); resmi yüklüyor.
                     var distance = locationA.distanceTo(locationB)
 
                     distance = (distance / 1000.0).toFloat()
                     var s = String.format("%.2f", distance)
                     forFireDetail.add(parkname)
+                    if (situation.equals("1")) {
+                        mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_situationparssist_park)))
 
-                    mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
+                    }
+                    if (situation.equals("0")) {
+                        mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
+
+                    }
                     mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(applicationContext))
+
+
+
                     mMap.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
                         override fun onInfoWindowClick(p0: Marker?) {
                             val markerTitle = p0?.title
                             for (placename in forFireDetail) {
                                 if (markerTitle.equals(placename)) {
-                                    val intent = Intent(applicationContext, DetailActivity::class.java)
-                                    intent.putExtra("name", placename)
 
-                                    startActivity(intent)
+                                    myDialog!!.setContentView(R.layout.customcardpopup)
+                                    var textCloseCard = myDialog!!.findViewById(R.id.txtclosecard) as TextView
+                                    //var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                                    textCloseCard.setOnClickListener(object : View.OnClickListener {
+                                        override fun onClick(v: View?) {
+                                            myDialog!!.dismiss()
+                                        }
+
+
+                                    })
+
+                                    val reference = FirebaseDatabase.getInstance().getReference()
+                                    val query = reference.child("Locations").orderByChild("parkname").equalTo(placename)
+                                    query.addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onCancelled(p0: DatabaseError) {
+                                            Toast.makeText(this@MapsActivity, "Database Park Conneciton Error", Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        override fun onDataChange(p0: DataSnapshot) {
+                                            for (ds in p0.children) {
+                                                //println("Ds "+ds.getValue())
+                                                var hashMap: (HashMap<String, String>) = ds.getValue() as HashMap<String, String>
+
+
+                                                val parkname = hashMap.get("parkname") as String
+                                                println("parkismi" + parkname)
+                                                val parkdetail = hashMap.get("parkdetail") as String
+                                                val uriImage = hashMap.get("downloadurl") as String
+                                                val situation = hashMap.get("situation") as String
+                                                val cardParkName = myDialog?.findViewById<TextView>(R.id.nameTextCardView) //custom dialog olduğu zaman id böyle çekiyorsun!!
+                                                val cardParkDetailName = myDialog?.findViewById<TextView>(R.id.detailTextCardView) //custom dialog olduğu zaman id böyle çekiyorsun!!
+                                                val cardParkImage = myDialog?.findViewById<ImageView>(R.id.detailImageCardView) //custom dialog olduğu zaman id böyle çekiyorsun!!
+                                                val situationCard = myDialog?.findViewById<TextView>(R.id.situationCard) //custom dialog olduğu zaman id böyle çekiyorsun!!
+
+                                                Picasso.get().load(uriImage).into(cardParkImage!!, object : Callback {
+                                                    override fun onSuccess() {
+                                                        progressBar?.setVisibility(View.INVISIBLE)
+                                                    }
+
+                                                    override fun onError(e: Exception?) {
+                                                        Toast.makeText(applicationContext, "Resim Yüklenemedi", Toast.LENGTH_SHORT).show()
+                                                    }
+
+
+                                                })
+
+                                                cardParkName!!.text = parkname
+                                                cardParkDetailName!!.text = parkdetail
+                                                if (situation.equals("1")) {
+                                                    situationCard!!.text = "Açık Otopark"
+                                                }
+                                                if (situation.equals("0")) {
+                                                    situationCard!!.text = "Kapalı Otopark"
+                                                }
+
+
+                                            }
+                                        }
+
+                                    })
+                                    myDialog!!.show()
+
+
+                                    // ------------
+                                    /*  myDialog!!.setContentView(R.layout.customcardpopup)
+                                      var textCloseCard = myDialog!!.findViewById(R.id.txtclosecard) as TextView
+                                      //var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                                      textCloseCard.setOnClickListener(object : View.OnClickListener {
+                                          override fun onClick(v: View?) {
+                                              myDialog!!.dismiss()
+                                          }
+
+
+                                      })
+                                      myDialog!!.show()
+                                      val cardParkName=myDialog?.findViewById<TextView>(R.id.nameTextCardView) //custom dialog olduğu zaman id böyle çekiyorsun!!
+                                      cardParkName!!.text=placename*/
+                                    //  ------------------------------
+                                    /*
+                                    //myDialog = Dialog(MapsActivity.this)
+                                    myDialog!!.setContentView(R.layout.customcardpopup)
+                                    var textCloseCard = myDialog!!.findViewById(R.id.txtclosecard) as TextView
+                                    //var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                                    textCloseCard.setOnClickListener(object : View.OnClickListener {
+                                        override fun onClick(v: View?) {
+                                            myDialog!!.dismiss()
+                                        }
+
+
+                                    })
+                                    myDialog!!.show()
+
+                                    Picasso.get().load(uriImage).into(detailImageView, object : Callback {
+                                        override fun onSuccess() {
+                                            progressBar?.setVisibility(View.INVISIBLE)
+                                        }
+
+                                        override fun onError(e: Exception?) {
+                                            Toast.makeText(applicationContext, "Resim Yüklenemedi", Toast.LENGTH_SHORT).show()
+                                        }
+
+
+                                    })
+                                    nameTextView.text = parkname
+                                    detailTextView.text = parkdetail
+
+                                    mMap.addMarker(MarkerOptions().position(userLocation).title(parkname))
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 17f))
+
+*/
+
+
+                                    //---------------------------------------
+                                    /*             myDialog!!.setContentView(R.layout.customcardpopup)
+                                                  var textCloseCard = myDialog!!.findViewById(R.id.txtclosecard) as TextView
+                                                  //var webButton = myDialog!!.findViewById(R.id.btnweb) as Button
+                                                  textCloseCard.setOnClickListener(object : View.OnClickListener {
+                                                      override fun onClick(v: View?) {
+                                                          myDialog!!.dismiss()
+                                                      }
+
+
+                                                  })
+
+                                                  val reference = FirebaseDatabase.getInstance().getReference()
+                                                  val query = reference.child("Locations").orderByChild("parkname").equalTo(placename)
+                                                  query.addListenerForSingleValueEvent(object : ValueEventListener {
+                                                      override fun onCancelled(p0: DatabaseError) {
+
+                                                      }
+
+                                                      override fun onDataChange(p0: DataSnapshot) {
+                                                          for (ds in p0.children) {
+                                                              //println("Ds "+ds.getValue())
+                                                              var hashMap: (HashMap<String, String>) = ds.getValue() as HashMap<String, String>
+                                                              //val parkname = hashMap.get("parkname") as String
+                                                              val parkdetail = hashMap.get("parkdetail") as String
+                                                              val latitute = hashMap.get("latitute") as String
+                                                              val longitute = hashMap.get("longitute") as String
+                                                              val latitudeDouble = latitute.toDouble()
+                                                              val longituteDouble = longitute.toDouble()
+                                                              val userLocation = LatLng(latitudeDouble, longituteDouble)
+                                                              val uriImage = hashMap.get("downloadurl") as String
+
+              /*                                                Picasso.get().load(uriImage).into(detailImageView,object : Callback{
+                                                                  override fun onSuccess() {
+                                                                      progressBar?.setVisibility(View.INVISIBLE)
+                                                                  }
+
+                                                                  override fun onError(e: Exception?) {
+                                                                      Toast.makeText(applicationContext,"Resim Yüklenemedi",Toast.LENGTH_SHORT).show()
+                                                                  }
+
+
+                                                              })
+                                                              */
+                                                              nameTextCardView.text = "sdada"
+                                                              detailTextView.text = parkdetail
+
+                                                              mMap.addMarker(MarkerOptions().position(userLocation).title(parkname))
+                                                              mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 17f))
+                                                          }
+                                                      }
+
+                                                  })
+
+
+
+                                                  myDialog!!.show()
+              */
+                                    //-------------------------------------------------
                                 }
 
                             }
                         }
                     })
-
+                  }
                 }
             }
         })

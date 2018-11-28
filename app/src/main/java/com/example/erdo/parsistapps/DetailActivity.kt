@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
 import com.github.ybq.android.spinkit.sprite.Sprite
+import com.github.ybq.android.spinkit.style.Pulse
 import com.github.ybq.android.spinkit.style.Wave
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -32,6 +33,7 @@ import com.parse.ParseQuery
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.mycard.*
 import java.lang.Exception
 
 class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -70,7 +72,7 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(p0: GoogleMap) {
         mMap = p0
         progressBar=findViewById(R.id.SpinKit)
-        val wave:Wave=Wave()
+        val  wave:Wave=Wave()
         progressBar?.setIndeterminateDrawableTiled(wave)
         val reference = FirebaseDatabase.getInstance().getReference()
         val query = reference.child("Locations").orderByChild("parkname").equalTo(chosenPlace)
@@ -90,9 +92,10 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
                     val latitudeDouble = latitute.toDouble()
                     val longituteDouble = longitute.toDouble()
                     val userLocation = LatLng(latitudeDouble, longituteDouble)
+                    val situation = hashMap.get("situation") as String
                     val uriImage = hashMap.get("downloadurl") as String
 
-                    Picasso.get().load(uriImage).into(detailImageView,object : Callback{
+                    Picasso.get().load(uriImage).into(detailImageViewDetailedCard,object : Callback{
                         override fun onSuccess() {
                             progressBar?.setVisibility(View.INVISIBLE)
                         }
@@ -103,9 +106,15 @@ class DetailActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
                     })
-                    nameTextView.text = parkname
-                    detailTextView.text = parkdetail
+                    nameTextViewDetailedCard.text = parkname
+                    detailTextViewDetailedCard.text = parkdetail
 
+                    if (situation.equals("1")) {
+                        situationDetail!!.text = "Açık Otopark"
+                    }
+                    if (situation.equals("0")) {
+                        situationDetail!!.text = "Kapalı Otopark"
+                    }
                     mMap.addMarker(MarkerOptions().position(userLocation).title(parkname))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 17f))
                 }

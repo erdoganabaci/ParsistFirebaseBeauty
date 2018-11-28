@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="true"
-    android:background="@android:color/white"
+    android:background="@color/sülogrey"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,10 +25,10 @@
 
 
             <TextView
-                android:id="@+id/nameTextView"
+                android:id="@+id/nameTextViewDetailedCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="id degiscekid degiscekid degiscekid degiscekid degiscekid degiscek"
+                android:text="ii"
                 android:textSize="14dp"
                 android:textStyle="bold"
                 android:textAlignment="center"
@@ -39,17 +39,18 @@
         <android.support.v7.widget.CardView
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="4dp"
+            android:layout_gravity="center"
             android:layout_margin="10dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <com.github.ybq.android.spinkit.SpinKitView
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/SpinKit"
-                style="@style/SpinKitView.Large.Circle"
+                style="@style/SpinKitView.Large.Wave"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                app:SpinKit_Color="@color/colorPrimary" />
+                app:SpinKit_Color="@color/colorParsist" />
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -59,7 +60,7 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="130dp"
-                    android:id="@+id/detailImageView"/>
+                    android:id="@+id/detailImageViewDetailedCard"/>
 
             </LinearLayout>
 
@@ -76,10 +77,10 @@
                 android:layout_height="50dp">
 
                 <TextView
-                    android:id="@+id/detailTextView"
+                    android:id="@+id/detailTextViewDetailedCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="id degiscekid degiscekid degiscekid llfkaflkafldegiscekid degiscekid degiscek"
+                    android:text=""
                     android:textSize="14dp"
                     android:textStyle="bold"
                     android:textAlignment="center"
@@ -132,6 +133,7 @@
                        </RelativeLayout>
 
                        <TextView
+                           android:id="@+id/situationDetail"
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_gravity="center"
@@ -140,6 +142,7 @@
                            android:textColor="@color/grey" />
 
                    </LinearLayout>
+
                    <LinearLayout
                        android:layout_weight="1"
                        android:orientation="vertical"
@@ -200,6 +203,37 @@
                            android:layout_height="wrap_content"
                            android:textColor="@color/grey"
                            android:text="Restaurant"/>
+
+                   </LinearLayout>
+                   <LinearLayout
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:orientation="vertical"
+                       android:layout_weight="1">
+
+                       <RelativeLayout
+                           android:layout_margin="10dp"
+                           android:gravity="center"
+                           android:layout_gravity="center"
+                           android:padding="10dp"
+                           android:background="@drawable/circleshape"
+                           android:layout_width="60dp"
+                           android:layout_height="60dp">
+
+                           <ImageView
+                               android:layout_width="35dp"
+                               android:layout_height="35dp"
+                               android:src="@drawable/ic_wifi_24dp" />
+
+                       </RelativeLayout>
+
+                       <TextView
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:layout_gravity="center"
+                           android:gravity="center"
+                           android:text="Wİfi"
+                           android:textColor="@color/grey" />
 
                    </LinearLayout>
 
