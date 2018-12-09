@@ -1,18 +1,25 @@
 package com.example.erdo.parsistapps
 
-internal class SampleClusterItem(@param:NonNull private val location: LatLng) : ClusterItem {
+import android.support.annotation.NonNull
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.clustering.ClusterItem
 
-    val latitude: Double
-        get() = location.latitude
 
-    val longitude: Double
-        get() = location.longitude
+class SampleClusterItem: ClusterItem {
+    override fun getPosition(): LatLng? {
+        return this!!.location
+    }
 
-    val title: String?
-        @Nullable
-        get() = null
+    private var location: LatLng? = null
+    constructor (@NonNull location:LatLng) {
+        this.location = location
+    }
+    override fun getSnippet(): String? {
+        return null
+    }
 
-    val snippet: String?
-        @Nullable
-        get() = null
+
+    override fun getTitle(): String? {
+        return null
+    }
 }

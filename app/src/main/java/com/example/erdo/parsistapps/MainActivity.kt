@@ -13,9 +13,7 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.Toast
+import android.widget.*
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -25,13 +23,11 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.mancj.materialsearchbar.MaterialSearchBar
-import com.parse.ParseException
-import com.parse.ParseObject
-import com.parse.ParseQuery
-import com.parse.ParseUser
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import java.security.AccessController.getContext
+import android.support.v7.widget.Toolbar
+import com.miguelcatalan.materialsearchview.MaterialSearchView
 
 //var mAdView: AdView? = null
 class MainActivity : AppCompatActivity() {
@@ -40,10 +36,15 @@ class MainActivity : AppCompatActivity() {
     var myRef: DatabaseReference? = null
     var mStorageRef: StorageReference? = null
     var nameArray = ArrayList<String>()
+    var mMaterialSearchView : MaterialSearchView? =null
+
     @SuppressLint("ResourceType")
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val menuInflater = menuInflater
         menuInflater.inflate(R.menu.show_place, menu)
+        val menuItem=menu?.findItem(R.id.search_menu)
+        mMaterialSearchView?.setMenuItem(menuItem)
+
         //menuInflater.inflate(R.id.home,menu)
         return super.onCreateOptionsMenu(menu)
     }
@@ -54,6 +55,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
 
         }
+        if (item?.itemId == R.id.search_menu) {
+            Toast.makeText(this,"Aramaya tıkladın",Toast.LENGTH_SHORT).show()
+
+        }
 
         return super.onOptionsItemSelected(item)
     }
@@ -61,8 +66,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
+
+        val toolbar=findViewById<Toolbar>(R.id.toolbar_github)
+        setSupportActionBar(toolbar)
+        mMaterialSearchView=findViewById(R.id.searchView)
 
         mAdView = findViewById(R.id.adView)
         val adRequest = AdRequest.Builder().build()
@@ -72,28 +80,38 @@ class MainActivity : AppCompatActivity() {
         myRef = firebaseDatabase!!.getReference()
         mStorageRef = FirebaseStorage.getInstance().getReference()
 
+       /* listView.setOnItemClickListener { adapterView, view, i, l ->
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            intent.putExtra("name", nameArray[i])
 
+            startActivity(intent)
+
+        }*/
         getFirebaseData()
         //listvieve tıklanınca ne olacağı yani nameleri alıp detailed activitye aktarıcak
         //ilk dataları formalite icabi koy resim eklemeyide sonra databaseden manuel eklerim.
-        listView.setOnItemClickListener { adapterView, view, i, l ->
-            val intent = Intent(applicationContext, DetailActivity::class.java)
-            intent.putExtra("name", nameArray[i])
-            startActivity(intent)
 
-        }
-        var android_id = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        println("emülatör_id:" + android_id)
+
     }
 
     fun getFirebaseData() {
         val lv = findViewById(R.id.listView) as ListView
-        val searchBar = findViewById(R.id.searchBar) as MaterialSearchBar
-        searchBar.setHint("Park Ara..")
-        searchBar.setSpeechMode(true)
+       // val searchBar = findViewById(R.id.searchBar) as MaterialSearchBar
+        //searchBar.setHint("Park Ara..")
+        //searchBar.setSpeechMode(false)
+        //searchBar.inflateMenu(R.menu.show_place)
         //lv.setBackgroundColor(Color.BLUE)
         val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, nameArray)
         listView.adapter = arrayAdapter
+
+        listView.setOnItemClickListener { adapterView, view, i, l ->
+            val intent = Intent(applicationContext, DetailActivity::class.java)
+            var model =adapterView.getItemAtPosition(i)  //Hatalı kısım
+            intent.putExtra("name", nameArray[i])
+            //var model=arrayAdapter.getItem(i) as Model
+            startActivity(intent)
+
+        }
         val newReference = FirebaseDatabase.getInstance().getReference("Locations")
         newReference.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -109,7 +127,43 @@ class MainActivity : AppCompatActivity() {
                 arrayAdapter.notifyDataSetChanged()
             }
         })
-        searchBar.addTextChangeListener(object : TextWatcher {
+
+        mMaterialSearchView!!.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener{
+            override fun onSearchViewClosed() {
+                val arrayAdapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_list_item_1, nameArray)
+                listView.adapter = arrayAdapter
+
+            }
+
+            override fun onSearchViewShown() {
+
+            }
+        })
+
+        mMaterialSearchView!!.setOnQueryTextListener(object : MaterialSearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                val arrayAdapter = ArrayAdapter<String> (this@MainActivity,android.R.layout.simple_list_item_1)
+
+               if (newText!=null && !newText.isEmpty()){
+                   for (s in nameArray){
+                        if (s.toLowerCase().contains(newText)){
+                            arrayAdapter.add(s)
+                        }
+                   }
+
+               }
+                else{
+                   arrayAdapter.addAll(nameArray)
+               }
+                listView.adapter=arrayAdapter
+                return false
+            }
+        })
+        /*searchBar.addTextChangeListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
 
             }
@@ -123,7 +177,7 @@ class MainActivity : AppCompatActivity() {
             }
 
 
-        })
+        })*/
     }
 
 }

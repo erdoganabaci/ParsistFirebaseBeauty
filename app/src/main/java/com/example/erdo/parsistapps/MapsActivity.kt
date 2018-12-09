@@ -16,6 +16,7 @@ import android.location.LocationListener
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.nfc.Tag
 import android.support.v7.app.AppCompatActivity
 
 import android.os.Bundle
@@ -24,6 +25,8 @@ import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -31,11 +34,8 @@ import android.widget.*
 import com.github.clans.fab.FloatingActionButton
 import com.github.clans.fab.FloatingActionMenu
 import com.github.ybq.android.spinkit.style.Wave
+import com.google.android.gms.maps.*
 
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
@@ -43,6 +43,8 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterManager
 import com.onesignal.OneSignal
 import com.parse.ParseException
 import com.parse.ParseFile
@@ -56,6 +58,7 @@ import kotlinx.android.synthetic.main.mycard.*
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 var latituteDouble: Double? = 0.0
@@ -63,7 +66,9 @@ var longituteDouble: Double? = 0.0
 var userLocation = LatLng(latituteDouble!!, longituteDouble!!)
 var googleMap: GoogleMap? = null
 
-class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
+class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnClusterClickListener<MyItem>, ClusterManager.OnClusterInfoWindowClickListener<MyItem>, ClusterManager.OnClusterItemClickListener<MyItem>, ClusterManager.OnClusterItemInfoWindowClickListener<MyItem> {
+
+
     private lateinit var mMap: GoogleMap
     internal lateinit var switch: Switch
     var firebaseDatabase: FirebaseDatabase? = null
@@ -80,6 +85,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     var myDialog: Dialog? = null
     var myDialogAbout: Dialog? = null
     var progressBar: ProgressBar? = null
+    var clusterManager: ClusterManager<MyItem>?=null
+    val clusterItems=ArrayList<MyItem>()
     //var name=""
     //var nameInfoArray=HashSet<String>()
 
@@ -245,7 +252,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         //upload()
         getFireLocation()
         mMap = googleMap
-
+         fun setupMapFragment() {
+            val mapFragment = getSupportFragmentManager()
+                    .findFragmentById(R.id.map) as SupportMapFragment
+            mapFragment.setRetainInstance(true)
+            mapFragment.getMapAsync(this)
+        }
         progressBar = findViewById(R.id.SpinKit)
         val wave: Wave = Wave()
         progressBar?.setIndeterminateDrawableTiled(wave)
@@ -388,6 +400,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 pd.show()
                 pd.setCancelable(true)
                 mMap.setMyLocationEnabled(true)
+                val mUiSettings = mMap.getUiSettings()
+                mUiSettings.isZoomControlsEnabled=true
+                mUiSettings.isCompassEnabled=true
+                mUiSettings.isMyLocationButtonEnabled=true
+                //mUiSettings.setScrollGesturesEnabled(true)
             } else {
 
                 mMap.setMyLocationEnabled(true)
@@ -463,6 +480,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val latitudeDouble = latitute.toDouble()
                     val longituteDouble = longitute.toDouble()
                     val userLocation = LatLng(latitudeDouble, longituteDouble)
+                   /*
                     val locationA = Location("point A")
                     locationA.setLatitude(com.example.erdo.parsistapps.userLocation.latitude)
                     locationA.setLongitude(com.example.erdo.parsistapps.userLocation.longitude)
@@ -476,13 +494,55 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     distance = (distance / 1000.0).toFloat()
                     var s = String.format("%.2f", distance)
+                        */
                     forFireDetail.add(parkname)
+                      clusterManager = ClusterManager(this@MapsActivity, mMap)
+                        val renderer=MyItemCustomIcon(this@MapsActivity,mMap,clusterManager)
+
+                        mMap.setOnCameraIdleListener(clusterManager)
+                        mMap.setOnMarkerClickListener(clusterManager)
+                        clusterManager!!.setOnClusterClickListener(this@MapsActivity)
+                        clusterManager!!.renderer=renderer
+
+
+                        clusterItems.add(MyItem(userLocation,parkname,parkdetail))
+                        clusterManager?.addItems(clusterItems)
+
+
+
+
+                        clusterManager!!.cluster()
+/*
+                        clusterManager!!.markerCollection.setOnInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter{
+                            override fun getInfoContents(p0: Marker?): View? {
+                                return null
+
+                            }
+
+                            override fun getInfoWindow(p0: Marker?): View {
+                                val inflater=getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                                val view=inflater.inflate(R.layout.custom_info_window,null)
+                                val customWindowTitle=view.findViewById(R.id.title) as TextView
+                                val customWindowSnippet=view.findViewById(R.id.snippet) as TextView
+                                customWindowTitle.setText(parkname)
+                                customWindowSnippet.setText(parkdetail)
+
+                                return  view
+
+
+                            }
+
+
+                        })
+*/
+
+
                     if (situation.equals("1")) {
-                        mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_situationparssist_park)))
+                        //mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_situationparssist_park)))
 
                     }
                     if (situation.equals("0")) {
-                        mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
+                       //mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
 
                     }
                     mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(applicationContext))
@@ -676,6 +736,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
 
+
+    }
+
+    override fun onClusterClick(p0: Cluster<MyItem>?): Boolean {
+        mMap.animateCamera(CameraUpdateFactory.zoomIn())
+        return true
+    }
+
+    override fun onClusterInfoWindowClick(p0: Cluster<MyItem>?) {
+            Toast.makeText(this,"yalancoo",Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onClusterItemClick(p0: MyItem?): Boolean {
+        return false
+    }
+
+    override fun onClusterItemInfoWindowClick(p0: MyItem?) {
 
     }
 
