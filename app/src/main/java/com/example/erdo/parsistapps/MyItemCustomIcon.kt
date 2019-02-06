@@ -17,6 +17,8 @@ class MyItemCustomIcon : DefaultClusterRenderer<MyItem> {
 
 
     override fun onBeforeClusterRendered(cluster: Cluster<MyItem>?, markerOptions: MarkerOptions?) {
+        markerOptions?.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_situationparssist_park))
+
         super.onBeforeClusterRendered(cluster, markerOptions)
     }
 

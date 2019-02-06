@@ -252,6 +252,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
         //upload()
         getFireLocation()
         mMap = googleMap
+        val mUiSettings = mMap.getUiSettings()
+        mUiSettings.isZoomControlsEnabled=true
+        mUiSettings.isCompassEnabled=true
+        mUiSettings.isMyLocationButtonEnabled=true
          fun setupMapFragment() {
             val mapFragment = getSupportFragmentManager()
                     .findFragmentById(R.id.map) as SupportMapFragment
@@ -400,10 +404,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                 pd.show()
                 pd.setCancelable(true)
                 mMap.setMyLocationEnabled(true)
-                val mUiSettings = mMap.getUiSettings()
-                mUiSettings.isZoomControlsEnabled=true
-                mUiSettings.isCompassEnabled=true
-                mUiSettings.isMyLocationButtonEnabled=true
+
                 //mUiSettings.setScrollGesturesEnabled(true)
             } else {
 
@@ -502,8 +503,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                         mMap.setOnCameraIdleListener(clusterManager)
                         mMap.setOnMarkerClickListener(clusterManager)
                         clusterManager!!.setOnClusterClickListener(this@MapsActivity)
+                        mMap.setOnInfoWindowClickListener(clusterManager)
+                        //mMap.setInfoWindowAdapter(clusterManager!!.markerManager)
+                        clusterManager!!.setOnClusterItemInfoWindowClickListener(this@MapsActivity)
                         clusterManager!!.renderer=renderer
-
 
                         clusterItems.add(MyItem(userLocation,parkname,parkdetail))
                         clusterManager?.addItems(clusterItems)
@@ -545,11 +548,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                        //mMap.addMarker(MarkerOptions().position(userLocation).title(parkname).snippet("Detaylar:" + parkdetail + "\nKuşuçuşu Uzaklığım:" + s + " km").icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_park)))
 
                     }
-                    mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(applicationContext))
+                   mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(applicationContext))
 
 
 
-                    mMap.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
+                    clusterManager!!.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
                         override fun onInfoWindowClick(p0: Marker?) {
                             val markerTitle = p0?.title
                             for (placename in forFireDetail) {
@@ -741,19 +744,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
 
     override fun onClusterClick(p0: Cluster<MyItem>?): Boolean {
         mMap.animateCamera(CameraUpdateFactory.zoomIn())
+        Toast.makeText(this, "Cluster Clicked", Toast.LENGTH_SHORT).show()
+
+        //p0.position.latitude
         return true
     }
 
     override fun onClusterInfoWindowClick(p0: Cluster<MyItem>?) {
-            Toast.makeText(this,"yalancoo",Toast.LENGTH_SHORT).show()
+           // Toast.makeText(this,"yalancoo",Toast.LENGTH_SHORT).show()
     }
 
     override fun onClusterItemClick(p0: MyItem?): Boolean {
-        return false
+        Toast.makeText(this,"cluster item clicked",Toast.LENGTH_SHORT).show()
+        return true
     }
 
     override fun onClusterItemInfoWindowClick(p0: MyItem?) {
-
+        Toast.makeText(this,"Cluster Item Info clicked",Toast.LENGTH_LONG).show()
     }
 
     fun getLocation() {
