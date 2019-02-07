@@ -498,7 +498,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                         */
                     forFireDetail.add(parkname)
                       clusterManager = ClusterManager(this@MapsActivity, mMap)
-                        val renderer=MyItemCustomIcon(this@MapsActivity,mMap,clusterManager)
+
 
                         mMap.setOnCameraIdleListener(clusterManager)
                         mMap.setOnMarkerClickListener(clusterManager)
@@ -506,7 +506,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                         mMap.setOnInfoWindowClickListener(clusterManager)
                         //mMap.setInfoWindowAdapter(clusterManager!!.markerManager)
                         clusterManager!!.setOnClusterItemInfoWindowClickListener(this@MapsActivity)
-                        clusterManager!!.renderer=renderer
+
 
                         clusterItems.add(MyItem(userLocation,parkname,parkdetail))
                         clusterManager?.addItems(clusterItems)
@@ -514,7 +514,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
 
 
 
-                        clusterManager!!.cluster()
+                       // clusterManager!!.cluster()
 /*
                         clusterManager!!.markerCollection.setOnInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter{
                             override fun getInfoContents(p0: Marker?): View? {
@@ -552,7 +552,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
 
 
 
-                    clusterManager!!.markerCollection.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
+                    mMap.setOnInfoWindowClickListener(object : GoogleMap.OnInfoWindowClickListener {
                         override fun onInfoWindowClick(p0: Marker?) {
                             val markerTitle = p0?.title
                             for (placename in forFireDetail) {
@@ -736,6 +736,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
                     })
                   }
                 }
+                val renderer=MyItemCustomIcon(this@MapsActivity,mMap,clusterManager)
+                clusterManager!!.renderer=renderer
+               // clusterManager!!.cluster()
             }
         })
 
@@ -743,10 +746,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
     }
 
     override fun onClusterClick(p0: Cluster<MyItem>?): Boolean {
-        mMap.animateCamera(CameraUpdateFactory.zoomIn())
+       /* val userLocation = LatLng(p0!!.position.latitude, p0!!.position.longitude)
+        val center = CameraUpdateFactory.newLatLng(p0.position)
+
+        val zoom = CameraUpdateFactory.zoomIn()
+        mMap.moveCamera(center)
+        mMap.animateCamera(zoom)
+        //mMap.animateCamera(CameraUpdateFactory.zoomIn())
         Toast.makeText(this, "Cluster Clicked", Toast.LENGTH_SHORT).show()
 
-        //p0.position.latitude
+        //p0.position.latitude*/
+
+        val builder = LatLngBounds.builder()
+        val myItem = p0!!.getItems()
+        for (item in myItem)
+        {
+            val myItemPosition = item.getPosition()
+            builder.include(myItemPosition)
+        }
+        val bounds = builder.build()
+        try
+        {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+        }
+        catch (error:Exception) {
+            print(error.message)
+        }
         return true
     }
 
