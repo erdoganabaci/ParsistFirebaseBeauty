@@ -102,16 +102,32 @@ class MainActivity : AppCompatActivity() {
         //searchBar.inflateMenu(R.menu.show_place)
         //lv.setBackgroundColor(Color.BLUE)
         val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, nameArray)
-        listView.adapter = arrayAdapter
+        lv.adapter = arrayAdapter
 
-        listView.setOnItemClickListener { adapterView, view, i, l ->
-            val intent = Intent(applicationContext, DetailActivity::class.java)
+     /*   lv.setOnItemClickListener { adapterView, view, i, l ->
+           val intent = Intent(applicationContext, DetailActivity::class.java)
             var model =adapterView.getItemAtPosition(i)  //Hatalı kısım
             intent.putExtra("name", nameArray[i])
             //var model=arrayAdapter.getItem(i) as Model
+            Toast.makeText(this,"Listviewa dokandın "+nameArray[i],Toast.LENGTH_LONG).show()
             startActivity(intent)
 
+
+
         }
+    */
+      lv.setOnItemClickListener(object : AdapterView.OnItemClickListener{
+          override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+              val intent = Intent(applicationContext,DetailActivity::class.java)
+              val exactPosition = parent!!.getItemAtPosition(position) as String
+              println("gerçek yerim listede :" +exactPosition)
+
+              intent.putExtra("name",exactPosition)
+              startActivity(intent)
+          }
+
+      })
+
         val newReference = FirebaseDatabase.getInstance().getReference("Locations")
         newReference.addValueEventListener(object : ValueEventListener {
             override fun onCancelled(p0: DatabaseError) {
@@ -131,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         mMaterialSearchView!!.setOnSearchViewListener(object : MaterialSearchView.SearchViewListener{
             override fun onSearchViewClosed() {
                 val arrayAdapter = ArrayAdapter(this@MainActivity, android.R.layout.simple_list_item_1, nameArray)
-                listView.adapter = arrayAdapter
+                lv.adapter = arrayAdapter
 
             }
 
@@ -159,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                 else{
                    arrayAdapter.addAll(nameArray)
                }
-                listView.adapter=arrayAdapter
+                lv.adapter=arrayAdapter
                 return false
             }
         })
