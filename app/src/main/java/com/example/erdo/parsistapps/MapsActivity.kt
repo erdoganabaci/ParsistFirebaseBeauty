@@ -87,6 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
     var progressBar: ProgressBar? = null
     var clusterManager: ClusterManager<MyItem>?=null
     val clusterItems=ArrayList<MyItem>()
+    var flag : Boolean = true
     //var name=""
     //var nameInfoArray=HashSet<String>()
 
@@ -279,19 +280,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,ClusterManager.OnCl
 
         changeMap?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                try {
-                    val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.standartmap))
-                    if (!succes) {
-                        Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
 
+                if (flag){
+                    changeMap!!.setImageDrawable(ContextCompat.getDrawable(applicationContext,R.mipmap.map_icon_white))
+                    try {
+                        val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.standartmap))
+                        if (!succes) {
+                            Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
+
+                    }
+                    flag = false
+                }else if (!flag){
+                    changeMap!!.setImageDrawable(ContextCompat.getDrawable(applicationContext,R.mipmap.map_icon_black))
+                    try {
+                        val succes = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this@MapsActivity, R.raw.darkmap))
+                        if (!succes) {
+                            Toast.makeText(applicationContext, "Map Parsing Failed", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(applicationContext, e.localizedMessage, Toast.LENGTH_SHORT).show()
+
+                    }
+                    flag = true
                 }
+
+
             }
         })
 
         switch = findViewById(R.id.switch1) as Switch
+        switch.visibility = View.INVISIBLE
         switch.setOnClickListener {
             if (switch.isChecked == true) {
                 switch.setTextColor(Color.BLACK)
